@@ -7,7 +7,7 @@
  */
 (function () {
   'use strict';
-  var cvnApiUrl = 'https://cvn.wmcloud.org/api.php?users=Krinkle';
+  var cvnApiUrl = 'https://cvn.wmcloud.org/api.php';
   var intuitionLoadUrl = 'https://meta.wikimedia.org/w/index.php?title=User:Krinkle/Scripts/Intuition.js&action=raw&ctype=text/javascript';
   var cvnLogo = 'https://upload.wikimedia.org/wikipedia/commons/c/c2/CVN_logo.svg';
   var blacklistIcon = 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Nuvola_apps_important.svg/18px-Nuvola_apps_important.svg.png';
