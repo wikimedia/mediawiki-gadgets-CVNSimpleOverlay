@@ -1,22 +1,20 @@
 /**
  * CVN Overlay
  *
- * From <https://github.com/countervandalism/mw-gadget-cvnoverlay>.
+ * Copyright Timo Tijhof, https://gerrit.wikimedia.org/g/mediawiki/gadgets/CVNSimpleOverlay/
  *
- * @author Timo Tijhof
- * @license https://krinkle.mit-license.org/2010-2020/
+ * SPDX-License-Identifier: MIT
  */
 (function () {
   'use strict';
-  var
-    msg,
-    cvnApiUrl = 'https://cvn.wmflabs.org/api.php',
-    intuitionLoadUrl = 'https://meta.wikimedia.org/w/index.php?title=User:Krinkle/Scripts/Intuition.js&action=raw&ctype=text/javascript',
-    cvnLogo = 'https://upload.wikimedia.org/wikipedia/commons/c/c2/CVN_logo.svg',
-    blacklistIcon = 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Nuvola_apps_important.svg/18px-Nuvola_apps_important.svg.png',
-    fullpagename = false,
-    userSpecCache = null,
-    canonicalSpecialPageName = mw.config.get('wgCanonicalSpecialPageName');
+  var cvnApiUrl = 'https://cvn.wmcloud.org/api.php?users=Krinkle';
+  var intuitionLoadUrl = 'https://meta.wikimedia.org/w/index.php?title=User:Krinkle/Scripts/Intuition.js&action=raw&ctype=text/javascript';
+  var cvnLogo = 'https://upload.wikimedia.org/wikipedia/commons/c/c2/CVN_logo.svg';
+  var blacklistIcon = 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Nuvola_apps_important.svg/18px-Nuvola_apps_important.svg.png';
+  var fullpagename = false;
+  var userSpecCache = null;
+  var canonicalSpecialPageName = mw.config.get('wgCanonicalSpecialPageName');
+  var msg;
 
   // Construct a URL to a page on the wiki
   function wikiLink (s, targetserver) {
@@ -24,21 +22,19 @@
   }
 
   function parseWikiLink (input) {
-    var targetserver, parts;
-
-    targetserver = ''; // relative to current;
+    // relative to current
+    var targetserver = '';
     if (input.indexOf('Autoblacklist: ') === 0) {
-      parts = input.split(' ');
+      var parts = input.split(' ');
       if (parts[parts.length - 2] === 'on' || parts[parts.length - 2] === 'at') {
         targetserver = 'https://' + parts[parts.length - 1] + '.org';
       }
     }
 
     return input.replace(/\[\[([^\]]+)\]\]/g, function (match, inner) {
-      var split, target, label;
-      split = inner.split('|');
-      target = split[0];
-      label = split[1] || split[0];
+      var split = inner.split('|');
+      var target = split[0];
+      var label = split[1] || split[0];
       // TODO: This double-escapes
       return mw.html.element('a', {
         href: wikiLink(target, targetserver),
@@ -48,9 +44,8 @@
   }
 
   function doUserSpecBox (data) {
-    var html, comment, commentHtml, d;
-
-    comment = data.comment || '';
+    var comment = data.comment || '';
+    var commentHtml;
     if (comment.length > 70) {
       commentHtml = mw.html.element('em',
         { style: 'cursor: help;', title: comment },
@@ -60,6 +55,7 @@
       commentHtml = '<em>' + parseWikiLink(mw.html.escape(comment)) + '</em>';
     }
 
+    var html;
     if (data.type) {
       html = 'On <span class="cvn-overlay-list cvn-overlay-list-' + data.type + '">' + data.type + '</span>';
     } else {
@@ -71,7 +67,7 @@
     }
 
     if (data.expiry) {
-      d = new Date();
+      var d = new Date();
       d.setTime(data.expiry * 1000);
       html += ' <abbr style="vertical-align: super; font-size: smaller; color: purple;" title="until ' + mw.html.escape(d.toUTCString()) + '">(expiry)</abbr>';
     }
@@ -90,10 +86,10 @@
   }
 
   function getUserSpec () {
-    var val;
     if (userSpecCache === null) {
       userSpecCache = false;
-      if (mw.config.get('wgTitle').indexOf('/') === -1 && $.inArray(mw.config.get('wgNamespaceNumber'), [2, 3]) !== -1) {
+      var val;
+      if (mw.config.get('wgTitle').indexOf('/') === -1 && [2, 3].indexOf(mw.config.get('wgNamespaceNumber')) !== -1) {
         userSpecCache = mw.config.get('wgTitle');
       } else if (canonicalSpecialPageName === 'Contributions') {
         val = $.trim($('#bodyContent .mw-contributions-form input[name="target"]').val());
@@ -117,8 +113,8 @@
   }
 
   function doOverlayUsers (users) {
-    var userSpec = getUserSpec(),
-      userSpecDone = false;
+    var userSpec = getUserSpec();
+    var userSpecDone = false;
     $.each(users, function (name, user) {
       var tooltip, d;
       if (user.type === 'blacklist') {
@@ -172,8 +168,7 @@
   }
 
   function doOverlayPage (page) {
-    var text, $node, parent;
-
+    var text;
     if (page.comment) {
       text = msg('reason') + ': ' + parseWikiLink(mw.html.escape(page.comment)) + '. ';
     } else {
@@ -186,9 +181,9 @@
       text += msg('adder') + ': ' + msg('adder-empty');
     }
 
-    $node = $('<span class="cvn-overlay-pagesub" title="' + mw.html.escape(text) + '"><span class="cvn-overlay-logo" title="Counter-Vandalism Network"></span> CVN: ' + mw.html.escape(msg('globalwatched')) + '</span>');
+    var $node = $('<span class="cvn-overlay-pagesub" title="' + mw.html.escape(text) + '"><span class="cvn-overlay-logo" title="Counter-Vandalism Network"></span> CVN: ' + mw.html.escape(msg('globalwatched')) + '</span>');
 
-    parent = document.getElementById('left-navigation');
+    var parent = document.getElementById('left-navigation');
     if (parent) {
       // Vector skin
       $node.addClass('cvn-overlay-pagesub--portlet');
@@ -214,7 +209,7 @@
       },
       dataType: 'json',
       cache: true
-    }).done(function (data) {
+    }).then(function (data) {
       if (data.users) {
         doOverlayUsers(data.users);
       }
@@ -274,7 +269,7 @@
 
     $('.mw-userlink').each(function () {
       var username = $(this).text();
-      if ($.inArray(username, usernamesOnPage) === -1) {
+      if (usernamesOnPage.indexOf(username) === -1) {
         usernamesOnPage.push(username);
       }
     });
@@ -316,11 +311,11 @@
       .then(function () {
         return mw.libs.intuition.load('cvnoverlay');
       })
-      .done(function () {
+      .then(function () {
         msg = $.proxy(mw.libs.intuition.msg, null, 'cvnoverlay');
       });
 
-    $.when(mw.loader.using(['mediawiki.util']), i18nLoad, $.ready).done(execute);
+    $.when(mw.loader.using(['mediawiki.util']), i18nLoad, $.ready).then(execute);
   }
 
   // Don't load at all in edit mode unless the page doesn't exist yet (like a User-page)
