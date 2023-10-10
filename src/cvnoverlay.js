@@ -202,6 +202,10 @@
   function checkAPI (users) {
     $.ajax({
       url: cvnApiUrl,
+      // SECURITY: Use POST parameters to avoid storing personal information
+      // about who is reviewing who's contributions and which articles they read.
+      // Per <https://phabricator.wikimedia.org/T207900>, the full URL of cross-origin
+      // fetches is is recorded in Logstash for 90 days (for potential CSP violations).
       method: 'POST',
       data: {
         users: users.join('|'),
